@@ -100,15 +100,13 @@ def main():
     test_audio = []
     for i, x_t in enumerate(test_loader):
         x_t = x_t.cuda()
-        #print("test000: ", x_t.shape)
         s_t = fft(x_t).detach()
-        #print("test: ", s_t.shape)  # [1,128,250]
 
         test_voc.append(s_t.cuda())
         test_audio.append(x_t)
 
         audio = x_t.squeeze().cpu()
-        save_sample(root / ("original_%d.wav" % i), 16000, audio)  # !!! root=args.save_path
+        save_sample(root / ("original_%d.wav" % i), 16000, audio)  # root=args.save_path
         writer.add_audio("original/sample_%d.wav" % i, audio, 0, sample_rate=16000)
 
         if i == args.n_test_samples - 1:
@@ -125,15 +123,11 @@ def main():
     for epoch in range(1, args.epochs + 1):
         for iterno, x_t in enumerate(train_loader):
             x_t = x_t.cuda()
-            #print("1: ", x_t.shape)  # [16,1,64000]
-            s_t = fft(x_t).detach() 
-            #print("2: ", s_t.shape) #[16,128,250]
+            s_t = fft(x_t).detach()
             x_pred_t = netG(s_t.cuda())
-            #print("3: ", x_pred_t.shape)
 
             with torch.no_grad():
                 s_pred_t = fft(x_pred_t.detach())
-                #print("4: ", s_pred_t.shape)
                 s_error = F.l1_loss(s_t, s_pred_t).item()
 
             #######################
